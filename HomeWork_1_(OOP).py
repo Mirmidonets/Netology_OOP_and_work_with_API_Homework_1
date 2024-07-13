@@ -17,6 +17,23 @@ class Student:
         else:
             return 'Ошибка'
 
+    def _get_avarage_grade(self):
+        list_grades = []
+        for each_cource in self.grades:
+            list_grades += self.grades[each_cource]
+
+        avg = sum(list_grades) / len(list_grades)
+        return round(avg, 2)
+
+    def __str__(self):
+        return (f'Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за домашние задания: '
+                f'{self._get_avarage_grade()}\nКурсы в процессе изучения: {", ".join(self.courses_in_progress)}\n'
+                f'Завершенные курсы: {", ".join(self.finished_courses)}')
+
+    def __gt__(self, other_student):
+        if isinstance(other_student, Student):
+            return self._get_avarage_grade() > other_student._get_avarage_grade()
+
 
 class Mentor:
     def __init__(self, name, surname):
@@ -29,6 +46,21 @@ class Lecturer(Mentor):
     def __init__(self, name, surname):
         super().__init__(name, surname)
         self.grades = {}
+
+    def _get_avarage_grade(self):
+        list_grades = []
+        for each_cource in self.grades:
+            list_grades += self.grades[each_cource]
+
+        avg = sum(list_grades) / len(list_grades)
+        return round(avg, 2)
+
+    def __str__(self):
+        return f'Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за лекции: {self._get_avarage_grade()}'
+
+    def __gt__(self, other_lecturer):
+        if isinstance(other_lecturer, Lecturer):
+            return self._get_avarage_grade() > other_lecturer._get_avarage_grade()
 
 
 class Reviewer(Mentor):
@@ -43,6 +75,9 @@ class Reviewer(Mentor):
                 student.grades[course] = [grade]
         else:
             return 'Ошибка'
+
+    def __str__(self):
+        return f'Имя: {self.name}\nФамилия: {self.surname}'
 
 
 best_student = Student('Ruoy', 'Eman', 'your_gender')
@@ -63,5 +98,6 @@ genius_reviewer.rate_hw(best_student, 'Python', 10)
 
 best_student.rate_lecturer(smart_lecturer, 'Python', 10)
 
-print(best_student.grades)
-print(smart_lecturer.grades)
+print(best_student.grades, end='\n \n')
+print(smart_lecturer.grades, end='\n \n')
+print(best_student, end='\n \n')
