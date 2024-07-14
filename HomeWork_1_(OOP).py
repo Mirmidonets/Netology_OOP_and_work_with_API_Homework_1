@@ -23,7 +23,7 @@ class Student:
             list_grades += self.grades[each_cource]
 
         avg = sum(list_grades) / len(list_grades)
-        return round(avg, 2)
+        return round(avg, 1)
 
     def __str__(self):
         return (f'Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за домашние задания: '
@@ -53,7 +53,7 @@ class Lecturer(Mentor):
             list_grades += self.grades[each_cource]
 
         avg = sum(list_grades) / len(list_grades)
-        return round(avg, 2)
+        return round(avg, 1)
 
     def __str__(self):
         return f'Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за лекции: {self._get_avarage_grade()}'
@@ -68,7 +68,8 @@ class Reviewer(Mentor):
         super().__init__(name, surname)
 
     def rate_hw(self, student, course, grade):
-        if isinstance(student, Student) and course in self.courses_attached and course in student.courses_in_progress:
+        if isinstance(student, Student) and course in self.courses_attached and (course in student.courses_in_progress
+                or course in student.finished_courses):
             if course in student.grades:
                 student.grades[course] += [grade]
             else:
@@ -80,24 +81,92 @@ class Reviewer(Mentor):
         return f'Имя: {self.name}\nФамилия: {self.surname}'
 
 
-best_student = Student('Ruoy', 'Eman', 'your_gender')
-best_student.courses_in_progress += ['Python']
+student_1 = Student('Peter', 'Parker', 'male')
+student_1.finished_courses += ['Python base', 'Git']
+student_1.courses_in_progress += ['OOP and work with API']
 
-cool_mentor = Mentor('Some', 'Buddy')
-cool_mentor.courses_attached += ['Python']
+student_2 = Student('Mary', 'Jane', 'female')
+student_2.finished_courses += ['Python base']
+student_2.courses_in_progress += ['Git']
 
-smart_lecturer = Lecturer('Tony', 'Stark')
-smart_lecturer.courses_attached += ['Python']
+lecturer_1 = Lecturer('Tony', 'Stark')
+lecturer_1.courses_attached += ['Python base', 'Git']
 
-genius_reviewer = Reviewer('Bruce', 'Banner')
-genius_reviewer.courses_attached += ['Python']
+lecturer_2 = Lecturer('Bruce', 'Banner')
+lecturer_2.courses_attached += ['Git', 'OOP and work with API']
 
-genius_reviewer.rate_hw(best_student, 'Python', 10)
-genius_reviewer.rate_hw(best_student, 'Python', 10)
-genius_reviewer.rate_hw(best_student, 'Python', 10)
+reviewer_1 = Reviewer('Wanda', 'Maximoff')
+reviewer_1.courses_attached += ['Python base', 'Git']
+reviewer_1.rate_hw(student_1, 'Python base', 10)
+reviewer_1.rate_hw(student_1, 'Python base', 9)
+reviewer_1.rate_hw(student_1, 'Python base', 10)
+reviewer_1.rate_hw(student_1, 'Git', 10)
+reviewer_1.rate_hw(student_1, 'Git', 10)
+reviewer_1.rate_hw(student_2, 'Python base', 9)
+reviewer_1.rate_hw(student_2, 'Python base', 8)
+reviewer_1.rate_hw(student_2, 'Python base', 7)
+reviewer_1.rate_hw(student_2, 'Git', 9)
+reviewer_1.rate_hw(student_2, 'Git', 8)
 
-best_student.rate_lecturer(smart_lecturer, 'Python', 10)
+reviewer_2 = Reviewer('Steve', 'Rogers')
+reviewer_2.courses_attached += ['Git', 'OOP and work with API']
+reviewer_2.rate_hw(student_1, 'Git', 10)
+reviewer_2.rate_hw(student_1, 'Git', 9)
+reviewer_2.rate_hw(student_1, 'OOP and work with API', 9)
+reviewer_2.rate_hw(student_1, 'OOP and work with API', 10)
+reviewer_2.rate_hw(student_2, 'Git', 9)
+reviewer_2.rate_hw(student_2, 'Git', 9)
+reviewer_2.rate_hw(student_2, 'OOP and work with API', 9)
+reviewer_2.rate_hw(student_2, 'OOP and work with API', 7)
 
-print(best_student.grades, end='\n \n')
-print(smart_lecturer.grades, end='\n \n')
-print(best_student, end='\n \n')
+student_1.rate_lecturer(lecturer_1, 'Python base', 8)
+student_1.rate_lecturer(lecturer_1, 'Git', 9)
+student_1.rate_lecturer(lecturer_2, 'Git', 10)
+student_1.rate_lecturer(lecturer_2, 'OOP and work with API', 9)
+
+student_2.rate_lecturer(lecturer_1, 'Python base', 10)
+student_2.rate_lecturer(lecturer_1, 'Git', 10)
+student_2.rate_lecturer(lecturer_2, 'Git', 9)
+student_2.rate_lecturer(lecturer_2, 'OOP and work with API', 10)
+
+print(student_1, end='\n \n')
+print(student_2, end='\n \n')
+print(lecturer_1, end='\n \n')
+print(lecturer_2, end='\n \n')
+print(reviewer_1, end='\n \n')
+print(reviewer_2, end='\n \n')
+
+print(student_1 > student_2)
+print(lecturer_1 > lecturer_2)
+print('')
+
+list_students = [student_1, student_2]
+list_lecturers = [lecturer_1, lecturer_2]
+
+
+def avg_hw_all_students(students_list, course):
+    list_grades = []
+    for student in students_list:
+        if course in student.grades:
+            list_grades.extend(student.grades[course])
+
+    return round(sum(list_grades) / len(list_grades), 1)
+
+
+def avg_hw_all_lecturers(lecturers_list, course):
+    list_grades = []
+    for lecture in lecturers_list:
+        if course in lecture.grades:
+            list_grades.extend(lecture.grades[course])
+
+    return round(sum(list_grades) / len(list_grades), 1)
+
+
+print(f'Средняя оценка за домашние задания по всем студентам в рамках курса "Python base": '
+      f'{avg_hw_all_students(list_students, "Python base")}')
+
+print(f'Средняя оценка за лекции всех лекторов в рамках курса "Git": '
+      f'{avg_hw_all_lecturers(list_lecturers, "Git")}')
+
+print(f'Средняя оценка за лекции всех лекторов в рамках курса "OOP and work with API": '
+      f'{avg_hw_all_lecturers(list_lecturers, "OOP and work with API")}')
